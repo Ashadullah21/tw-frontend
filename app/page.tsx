@@ -1,0 +1,178 @@
+'use client';
+
+import React from 'react';
+import UrlInput from '@/components/UrlInput';
+import VideoResult from '@/components/VideoResult';
+import Loader from '@/components/Loader';
+import ErrorMessage from '@/components/ErrorMessage';
+import Footer from '@/components/Footer';
+import { extractVideo } from '@/lib/api';
+import { VideoInfo, AppState } from '@/types';
+
+/**
+ * Main page — single-page Twitter/X video downloader with integrated rich Footer and Contact support.
+ *
+ * State machine:
+ *   idle    → user is on the input screen
+ *   loading → API call in progress (yt-dlp running on server)
+ *   success → video info received, show result card
+ *   error   → API returned an error or network failed
+ */
+export default function HomePage() {
+  const [appState, setAppState]     = React.useState<AppState>('idle');
+  const [videoInfo, setVideoInfo]   = React.useState<VideoInfo | null>(null);
+  const [errorMsg, setErrorMsg]     = React.useState<string>('');
+
+  /**
+   * Called by UrlInput after local URL validation passes.
+   */
+  const handleExtract = async (url: string) => {
+    setAppState('loading');
+    setVideoInfo(null);
+    setErrorMsg('');
+
+    try {
+      const data = await extractVideo(url);
+      setVideoInfo(data);
+      setAppState('success');
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : 'An unexpected error occurred. Please try again.';
+
+      setErrorMsg(message);
+      setAppState('error');
+    }
+  };
+
+  /**
+   * Reset back to the idle / input state.
+   */
+  const handleReset = () => {
+    setAppState('idle');
+    setVideoInfo(null);
+    setErrorMsg('');
+  };
+
+  return (
+    <div className="page-wrapper d-flex flex-column min-vh-100">
+      {/* Decorative background */}
+      <div className="page-bg" aria-hidden="true" />
+
+      {/* ── Navigation ─────────────────────────────────────────────── */}
+      <nav className="site-nav" aria-label="Site navigation">
+        <a href="/" className="nav-brand" aria-label="TW Downloader home">
+          <div className="nav-brand-icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.741l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+          </div>
+          TW Downloader
+        </a>
+
+        <a
+          href="https://github.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn btn-outline-secondary nav-github-btn"
+          aria-label="View source on GitHub"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" />
+          </svg>
+          GitHub
+        </a>
+      </nav>
+
+      {/* ── Main Content ────────────────────────────────────────────── */}
+      <main className="main-content flex-grow-1" id="main">
+
+        {/* Hero — always visible */}
+        <header className="hero-section animate-fade-in">
+          <div className="hero-badge">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.741l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+            Free · No Sign-in · Direct Download
+          </div>
+
+          <h1 className="hero-title">
+            Download <span className="gradient-text">Twitter & X</span><br />
+            Videos Instantly
+          </h1>
+
+          <p className="hero-subtitle">
+            Paste any Twitter or X video link and get direct download links
+            in 720p, 480p, and 360p — no watermarks, no registration.
+          </p>
+        </header>
+
+        {/* ── State-driven content area ───────────────────────────── */}
+
+        {/* IDLE — show input form */}
+        {appState === 'idle' && (
+          <section className="input-section animate-fade-in" aria-label="Video URL input">
+            <UrlInput onSubmit={handleExtract} isLoading={false} />
+
+            {/* How it works steps */}
+            <div className="steps-section" aria-label="How it works">
+              <p className="steps-title">How it works</p>
+              <div className="row g-3">
+                {[
+                  {
+                    num: '1',
+                    text: <><strong>Paste the URL</strong> of any tweet that contains a video.</>,
+                  },
+                  {
+                    num: '2',
+                    text: <><strong>Click "Get Download Links"</strong> — we extract all available qualities.</>,
+                  },
+                  {
+                    num: '3',
+                    text: <><strong>Choose your quality</strong> (720p / 480p / 360p) and download directly.</>,
+                  },
+                ].map((step) => (
+                  <div key={step.num} className="col-12 col-md-4">
+                    <div className="step-item h-100">
+                      <div className="step-number" aria-hidden="true">{step.num}</div>
+                      <p className="step-text mb-0">{step.text}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* LOADING — show spinner while API responds */}
+        {appState === 'loading' && (
+          <section aria-label="Loading">
+            <UrlInput onSubmit={handleExtract} isLoading={true} />
+            <Loader />
+          </section>
+        )}
+
+        {/* SUCCESS — show video result card */}
+        {appState === 'success' && videoInfo && (
+          <section className="input-section" aria-label="Download options">
+            <VideoResult video={videoInfo} onReset={handleReset} />
+          </section>
+        )}
+
+        {/* ERROR — show error message with retry */}
+        {appState === 'error' && (
+          <section aria-label="Error">
+            <UrlInput onSubmit={handleExtract} isLoading={false} />
+            <div className="mt-4 d-flex justify-content-center">
+              <ErrorMessage message={errorMsg} onRetry={handleReset} />
+            </div>
+          </section>
+        )}
+      </main>
+
+      {/* ── Integrated Rich Footer Component with Inbound Support ── */}
+      <Footer />
+    </div>
+  );
+}
