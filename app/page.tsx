@@ -117,7 +117,7 @@ export default function HomePage() {
                   },
                   {
                     num: '2',
-                    text: <><strong>Click "Get Download Links"</strong> — we extract all available qualities.</>,
+                    text: <><strong>Click "Get Link"</strong> — we extract all available qualities.</>,
                   },
                   {
                     num: '3',
