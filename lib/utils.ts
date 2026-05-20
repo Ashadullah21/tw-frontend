@@ -10,7 +10,7 @@
  *   http://www.twitter.com/...
  */
 const TWITTER_URL_PATTERN =
-  /^https?:\/\/(www\.)?(twitter\.com|x\.com)\/.+/i;
+  /^https?:\/\/(www\.)?(twitter\.com|x\.com)\/[a-zA-Z0-9_]+\/status\/\d+(?:\/[a-zA-Z0-9_\-\.\?\&%\=]*)?$/i;
 
 /**
  * Validates that a string is a recognisable Twitter or X video URL.
