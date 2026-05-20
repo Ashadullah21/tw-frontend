@@ -5,8 +5,13 @@ import { VideoInfo, ApiError } from '@/types';
  * Axios instance pre-configured to call the Laravel backend.
  * The base URL is injected at build time via NEXT_PUBLIC_API_URL.
  */
+let apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
+  apiBaseUrl = apiBaseUrl.replace(/^http:/i, 'https:');
+}
+
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: apiBaseUrl,
   timeout: 60_000, // yt-dlp can be slow on first run — allow 60 s
   headers: {
     'Content-Type': 'application/json',
@@ -50,3 +55,16 @@ export async function extractVideo(url: string): Promise<VideoInfo> {
     throw new Error('An unexpected error occurred. Please try again.');
   }
 }
+
+/**
+ * Sends a lightweight GET request to the backend health endpoint
+ * to trigger container startup/warming on Render.
+ */
+export async function warmupBackend(): Promise<void> {
+  try {
+    await apiClient.get('/api/health');
+  } catch (err) {
+    // Silently ignore warmup errors (does not affect UX)
+  }
+}
+

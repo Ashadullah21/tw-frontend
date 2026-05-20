@@ -26,7 +26,10 @@ export default function DownloadButton({ quality, videoTitle }: DownloadButtonPr
     const filename = buildFilename(videoTitle, quality.label, quality.ext);
 
     // Construct the backend download proxy URL to bypass CORS and force a download popup
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+    let baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+    if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
+      baseUrl = baseUrl.replace(/^http:/i, 'https:');
+    }
     const proxyUrl = `${baseUrl}/api/download?url=${encodeURIComponent(quality.url)}&title=${encodeURIComponent(filename)}`;
 
     // Create a temporary anchor and programmatically click it
