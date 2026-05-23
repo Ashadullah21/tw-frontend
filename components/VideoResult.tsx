@@ -98,8 +98,8 @@ export default function VideoResult({ video, onReset }: VideoResultProps) {
               </div>
             </div>
 
-            {/* Reset / search again */}
-            <div className="mt-4 pt-3 border-top border-subtle">
+            {/* Reset / search again & secondary MP3 download option aligned to bottom-right */}
+            <div className="mt-4 pt-3 border-top border-subtle d-flex justify-content-between align-items-center flex-wrap gap-3">
               <button
                 id="search-again-btn"
                 type="button"
@@ -109,6 +109,21 @@ export default function VideoResult({ video, onReset }: VideoResultProps) {
               >
                 ← Download another video
               </button>
+
+              {video.qualities.length > 0 && (
+                <div className="d-flex align-items-center gap-2">
+                  <span className="small d-none d-sm-inline" style={{ color: 'var(--text-secondary)' }}>Need audio?</span>
+                  <DownloadButton
+                    quality={{
+                      label: 'MP3 Audio',
+                      url: video.qualities[0].url, // Use the highest available quality stream for transcoding
+                      ext: 'mp3'
+                    }}
+                    videoTitle={video.title}
+                    format="mp3"
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>

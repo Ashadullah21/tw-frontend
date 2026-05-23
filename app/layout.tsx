@@ -31,9 +31,28 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#0a0e1a" />
         <link rel="icon" href="/favicon.ico" />
+        <link rel="manifest" href="/manifest.json" />
       </head>
       <body suppressHydrationWarning>
         {children}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js').then(
+                    function(reg) {
+                      console.log('PWA ServiceWorker registered with scope: ', reg.scope);
+                    },
+                    function(err) {
+                      console.error('PWA ServiceWorker registration failed: ', err);
+                    }
+                  );
+                });
+              }
+            `
+          }}
+        />
       </body>
     </html>
   );
