@@ -68,3 +68,23 @@ export async function warmupBackend(): Promise<void> {
   }
 }
 
+export interface FaqItem {
+  id: number;
+  question: string;
+  answer: string;
+  order: number;
+}
+
+/**
+ * Fetch all FAQs from the public API.
+ */
+export async function fetchFaqs(): Promise<FaqItem[]> {
+  try {
+    const response = await apiClient.get<FaqItem[]>('/api/faqs');
+    return response.data;
+  } catch (err) {
+    // Fallback to empty list if API call fails
+    return [];
+  }
+}
+

@@ -6,6 +6,7 @@ import VideoResult from '@/components/VideoResult';
 import Loader from '@/components/Loader';
 import ErrorMessage from '@/components/ErrorMessage';
 import Footer from '@/components/Footer';
+import FaqSection from '@/components/FaqSection';
 import { extractVideo, warmupBackend } from '@/lib/api';
 import { VideoInfo, AppState } from '@/types';
 
@@ -160,6 +161,9 @@ export default function HomePage() {
             </div>
           </section>
         )}
+
+        {/* Dynamic Accordion FAQ Section */}
+        <FaqSection />
       </main>
 
       {/* ── Integrated Rich Footer Component with Inbound Support ── */}
