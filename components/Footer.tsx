@@ -49,6 +49,10 @@ export default function Footer() {
             </p>
             <p className="small text-slate-500 mb-2">
               © {new Date().getFullYear()} TW Downloader. Fully self-contained. All rights reserved.
+              <span className="mx-2">•</span>
+              <a href="/privacy" className="text-slate-500 text-decoration-none hover:text-white" style={{ transition: 'color 0.2s ease' }}>
+                Privacy Policy
+              </a>
             </p>
  
             {/* Share Us block */}

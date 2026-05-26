@@ -78,7 +78,7 @@ export default function ContactForm() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            placeholder="John Doe"
+            placeholder="Your name"
             disabled={isLoading}
           />
         </div>
@@ -92,7 +92,7 @@ export default function ContactForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            placeholder="john@example.com"
+            placeholder="Your mail"
             disabled={isLoading}
           />
         </div>
